@@ -54,7 +54,7 @@ return {
         dependencies = { "neovim/nvim-lspconfig" },
         config = function()
         require("mason-lspconfig").setup({
-            ensure_installed = { "ts_ls", "eslint", "omnisharp", "html", "cssls" },
+            ensure_installed = { "ts_ls", "eslint", "omnisharp", "html", "cssls", "volar"},
         })
         end,
     },
@@ -125,6 +125,11 @@ return {
             }
         })
 
+        lspconfig.volar.setup({
+            capabilities = capabilities, -- Enable autocompletion support, etc.
+            filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" }, -- Filetypes it handles
+        })
+
         -- Null-ls setup for custom linters/formatters
         local null_ls = require("null-ls")
         null_ls.setup({
@@ -163,7 +168,7 @@ return {
             },
             mapping = cmp.mapping.preset.insert({
                 ["<C-Space>"] = cmp.mapping.complete(),
-                                                ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                                                ["<Tab>"] = cmp.mapping.confirm({ select = true }),
             }),
             sources = cmp.config.sources({
                 { name = "nvim_lsp" },
@@ -222,15 +227,11 @@ return {
         require("which-key").setup({})
         end,
     },
-
-    -- Git Integration
-    { "tpope/vim-fugitive" }, -- Git commands in Neovim
-
     -- Colorscheme (Optional)
     {
-        "morhetz/gruvbox",
+        "NTBBloodbath/doom-one.nvim",
         config = function()
-        vim.cmd("colorscheme gruvbox")
+        vim.cmd("colorscheme doom-one")
         end,
     },
 }
