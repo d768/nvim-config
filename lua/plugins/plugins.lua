@@ -76,7 +76,8 @@ return {
         dependencies = {
             "jose-elias-alvarez/typescript.nvim", -- Modern TypeScript support
             "jose-elias-alvarez/null-ls.nvim",   -- Linters and formatters
-            "saghen/blink.cmp"-- Autocompletion plugin
+            "saghen/blink.cmp",-- Autocompletion plugin
+            "williamboman/mason-lspconfig.nvim",
         },
         config = function()
         local lspconfig = require("lspconfig")
@@ -103,23 +104,17 @@ return {
             capabilities = capabilities,
         })
 
-        -- OmniSharp configuration (for C#)
         lspconfig.omnisharp.setup({
-            capabilities = capabilities,
-            cmd = {
-                "omnisharp",
-                "--languageserver",
-                "--hostPID",
-                tostring(vim.fn.getpid())
-            },
-            settings = {
-                RoslynExtensionsOptions = {
-                    enableDecompilationSupport = false,
-                    enableImportCompletion = true,
-                    enableAnalyzersSupport = true,
-                }
-            },
-            root_dir = lspconfig.util.root_pattern("*.sln")
+          capabilities = capabilities,
+          cmd = {
+            "dotnet",
+            "/home/sad/.local/share/nvim/mason/packages/omnisharp/libexec/OmniSharp.dll"
+          },
+          enable_roslyn_analysers = true,
+          enable_import_completion = true,
+          organize_imports_on_format = true,
+          enable_decompilation_support = true,
+          filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props', 'csx', 'targets' }
         })
 
         lspconfig.html.setup({
