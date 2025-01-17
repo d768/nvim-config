@@ -32,6 +32,7 @@ return {
         dependencies = {
             "williamboman/mason-lspconfig.nvim",
             "WhoIsSethDaniel/mason-tool-installer.nvim",
+            "neovim/nvim-lspconfig"
         },
         build = ":MasonUpdate",
         config = function()
@@ -45,18 +46,28 @@ return {
                 "eslint_d",
             },
         })
-        end,
-    },
 
-    -- Mason-LSPConfig: Automatically configures LSP servers installed by Mason
-    {
-        "williamboman/mason-lspconfig.nvim",
-        dependencies = { "neovim/nvim-lspconfig" },
-        config = function()
         require("mason-lspconfig").setup({
             ensure_installed = { "ts_ls", "eslint", "omnisharp", "html", "cssls", "volar"},
         })
         end,
+    },
+
+    -- Autocompletion
+    {
+        'saghen/blink.cmp',
+        version = 'v0.x',
+        opts = {
+            keymap = { preset = 'super-tab' },
+            appearance = {
+                use_nvim_cmp_as_default = true,
+                nerd_font_variant = 'mono'
+            },
+            sources = {
+                default = { 'lsp', 'path', 'snippets', 'buffer' },
+            },
+        },
+        opts_extend = { "sources.default" }
     },
 
     -- LSPConfig and TypeScript.nvim setup
@@ -65,11 +76,11 @@ return {
         dependencies = {
             "jose-elias-alvarez/typescript.nvim", -- Modern TypeScript support
             "jose-elias-alvarez/null-ls.nvim",   -- Linters and formatters
-            "hrsh7th/nvim-cmp",                  -- Autocompletion plugin
+            "saghen/blink.cmp"-- Autocompletion plugin
         },
         config = function()
         local lspconfig = require("lspconfig")
-        local capabilities = require("cmp_nvim_lsp").default_capabilities()
+        local capabilities = require('blink.cmp').get_lsp_capabilities()
 
         -- Setup TypeScript using typescript.nvim
         lspconfig.ts_ls.setup({
@@ -145,38 +156,7 @@ return {
         vim.api.nvim_create_autocmd("BufWritePre", {
             callback = function() vim.lsp.buf.format({ async = false }) end,
         })
-        end,
-    },
 
-    -- Autocompletion plugins
-    {
-        "hrsh7th/nvim-cmp",
-        dependencies = {
-            "hrsh7th/cmp-nvim-lsp",   -- LSP completions
-            "hrsh7th/cmp-buffer",     -- Buffer completions
-            "hrsh7th/cmp-path",       -- Path completions
-            "hrsh7th/cmp-vsnip",      -- Snippet completions
-            "hrsh7th/vim-vsnip",      -- Snippet engine
-        },
-        config = function()
-        local cmp = require("cmp")
-        cmp.setup({
-            snippet = {
-                expand = function(args)
-                vim.fn["vsnip#anonymous"](args.body)
-                end,
-            },
-            mapping = cmp.mapping.preset.insert({
-                ["<C-Space>"] = cmp.mapping.complete(),
-                                                ["<Tab>"] = cmp.mapping.confirm({ select = true }),
-            }),
-            sources = cmp.config.sources({
-                { name = "nvim_lsp" },
-                { name = "buffer" },
-                { name = "path" },
-                { name = "vsnip" },
-            }),
-        })
         end,
     },
 
@@ -234,4 +214,41 @@ return {
         vim.cmd("colorscheme doom-one")
         end,
     },
+    {
+        "folke/trouble.nvim",
+        opts = {}, -- for default options, refer to the configuration section for custom setup.
+        cmd = "Trouble",
+        keys = {
+            {
+                "<leader>xx",
+                "<cmd>Trouble diagnostics toggle<cr>",
+                desc = "Diagnostics (Trouble)",
+            },
+            {
+                "<leader>xX",
+                "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+                desc = "Buffer Diagnostics (Trouble)",
+            },
+            {
+                "<leader>cs",
+                "<cmd>Trouble symbols toggle focus=false<cr>",
+                desc = "Symbols (Trouble)",
+            },
+            {
+                "<leader>cl",
+                "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+                desc = "LSP Definitions / references / ... (Trouble)",
+            },
+            {
+                "<leader>xL",
+                "<cmd>Trouble loclist toggle<cr>",
+                desc = "Location List (Trouble)",
+            },
+            {
+                "<leader>xQ",
+                "<cmd>Trouble qflist toggle<cr>",
+                desc = "Quickfix List (Trouble)",
+            },
+        },
+    }
 }
